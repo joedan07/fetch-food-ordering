@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# local tooling
+.vercel/
+node_modules/
+
+# uploaded dish photos are local demo data, not source
+fetch/uploads/*
+!fetch/uploads/.gitkeep
+
+# never commit real credentials
+.env
+.env.local

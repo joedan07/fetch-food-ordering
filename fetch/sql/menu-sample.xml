@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sample bulk menu. Upload this on the restaurant console → Menu → Import XML. -->
+<menu restaurant="Spice Route">
+  <section name="Monsoon specials">
+    <dish>
+      <name>Pepper Rasam Shot</name>
+      <description>Served hot in a tumbler, more medicine than soup</description>
+      <price>60</price>
+      <prepMinutes>6</prepMinutes>
+      <veg>true</veg>
+    </dish>
+    <dish>
+      <name>Kerala Chicken Stew</name>
+      <description>Coconut milk, whole spices, appam on the side</description>
+      <price>280</price>
+      <prepMinutes>24</prepMinutes>
+      <veg>false</veg>
+    </dish>
+  </section>
+  <section name="Desserts">
+    <dish>
+      <name>Gulab Jamun (2 pcs)</name>
+      <description>Warm, soaked, dangerous</description>
+      <price>80</price>
+      <prepMinutes>4</prepMinutes>
+      <veg>true</veg>
+    </dish>
+  </section>
+</menu>
