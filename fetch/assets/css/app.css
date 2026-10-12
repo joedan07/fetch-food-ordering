@@ -384,13 +384,12 @@ textarea.input { min-height: 90px; resize: vertical; }
    instead of snapping between percentages. */
 @property --pct { syntax: '<number>'; initial-value: 0; inherits: false; }
 
-/* Cross-fade between pages where the browser supports it (Chrome, Safari 18+).
-   Everywhere else this line is ignored and navigation stays as it was. */
-@view-transition { navigation: auto; }
-::view-transition-old(root) { animation: vtOut .22s cubic-bezier(.4,0,1,1) both; }
-::view-transition-new(root) { animation: vtIn .34s cubic-bezier(0,0,.2,1) both; }
-@keyframes vtOut { to { opacity: 0; transform: translateY(-6px); } }
-@keyframes vtIn { from { opacity: 0; transform: translateY(10px); } }
+/* Pages fade in on their own as soon as they arrive.
+   We deliberately do NOT use cross-document view transitions: the browser holds
+   a frozen snapshot of the page you are leaving until the next one answers, and
+   on a server a second away that reads as a page that has stopped working. */
+body { animation: pageIn .4s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(6px); } }
 
 /* ---------- ambient: cursor spotlight + per-card glow ---------- */
 .spot {
@@ -503,7 +502,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 .feed li { animation: enterIn .4s both; }
 
 @media (prefers-reduced-motion: reduce) {
-  @view-transition { navigation: none; }
+  body { animation: none; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .rise > span { transform: none; animation: none; }
   .spot { display: none; }

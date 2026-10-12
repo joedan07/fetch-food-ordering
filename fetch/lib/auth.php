@@ -97,5 +97,5 @@ function my_restaurant(): array
  */
 function actor_name(): ?string
 {
-    return current_user()['name'] ?? ($_SESSION['guest_name'] ?? null);
+    return current_user()['name'] ?? guest_name();
 }

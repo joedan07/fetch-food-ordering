@@ -10,17 +10,79 @@
  * is only one code path to maintain.
  */
 
-/** The cart this browser is currently working on, if it is still open. */
+/**
+ * A long-lived id for this browser.
+ *
+ * Guests are recognised by this cookie rather than by the session. On a
+ * serverless host two requests can be served at the same moment by different
+ * machines, and the one that finishes last writes the whole session back — so a
+ * value written during a join could be overwritten by a poll that started
+ * before it. A cookie plus a column in the database has no such race, which is
+ * what keeps a shared cart from forgetting who you are.
+ */
+function browser_token(): string
+{
+    if (!empty($_COOKIE['fetch_id'])) {
+        return preg_replace('/[^a-f0-9]/', '', $_COOKIE['fetch_id']);
+    }
+    $token = bin2hex(random_bytes(16));
+    $_COOKIE['fetch_id'] = $token;
+    if (!headers_sent()) {
+        setcookie('fetch_id', $token, [
+            'expires'  => time() + 60 * 60 * 24 * 30,
+            'path'     => '/',
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+    return $token;
+}
+
+/** The name a guest typed when joining, remembered in a cookie as well. */
+function guest_name(): ?string
+{
+    return $_SESSION['guest_name'] ?? ($_COOKIE['fetch_name'] ?? null);
+}
+
+function remember_guest_name(string $name): void
+{
+    $name = mb_substr(trim($name), 0, 40);
+    $_SESSION['guest_name'] = $name;
+    if (!headers_sent()) {
+        setcookie('fetch_name', $name, [
+            'expires'  => time() + 60 * 60 * 24 * 30,
+            'path'     => '/',
+            'samesite' => 'Lax',
+        ]);
+    }
+}
+
+/**
+ * The cart this browser is working on.
+ *
+ * The session is only a shortcut: if it is empty we ask the database which open
+ * cart this person — account or browser token — is already a member of.
+ */
 function active_cart(): ?array
 {
     $id = $_SESSION['cart_id'] ?? null;
-    if (!$id) {
-        return null;
-    }
-    $cart = q1("SELECT * FROM carts WHERE id = ? AND status IN ('open','locked')", [$id]);
-    if (!$cart) {
+    if ($id) {
+        $cart = q1("SELECT * FROM carts WHERE id = ? AND status IN ('open','locked')", [$id]);
+        if ($cart) {
+            return $cart;
+        }
         unset($_SESSION['cart_id']);
-        return null;
+    }
+
+    $user = current_user();
+    $cart = $user
+        ? q1("SELECT c.* FROM carts c JOIN cart_members m ON m.cart_id = c.id
+               WHERE m.user_id = ? AND c.status = 'open' ORDER BY c.updated_at DESC LIMIT 1", [$user['id']])
+        : q1("SELECT c.* FROM carts c JOIN cart_members m ON m.cart_id = c.id
+               WHERE m.token = ? AND c.status = 'open' ORDER BY c.updated_at DESC LIMIT 1", [browser_token()]);
+
+    if ($cart) {
+        $_SESSION['cart_id'] = $cart['id'];
     }
     return $cart;
 }
@@ -59,7 +121,8 @@ function get_or_create_cart(int $restaurantId, bool $group = false): array
         'INSERT INTO carts (code, owner_user_id, restaurant_id, is_group) VALUES (?,?,?,?)',
         [new_cart_code(), $user['id'], $restaurantId, $group ? 1 : 0]
     );
-    insert('INSERT INTO cart_members (cart_id, user_id, name, is_owner) VALUES (?,?,?,1)', [$id, $user['id'], $user['name']]);
+    insert('INSERT INTO cart_members (cart_id, user_id, token, name, is_owner) VALUES (?,?,?,?,1)',
+        [$id, $user['id'], browser_token(), $user['name']]);
     $_SESSION['cart_id'] = $id;
     return q1('SELECT * FROM carts WHERE id = ?', [$id]);
 }
@@ -67,29 +130,29 @@ function get_or_create_cart(int $restaurantId, bool $group = false): array
 /** The member row for whoever is using this browser, creating it if needed. */
 function cart_member(array $cart, bool $create = true): ?array
 {
-    $user = current_user();
+    $user  = current_user();
+    $token = browser_token();
+
     if ($user) {
-        $m = q1('SELECT * FROM cart_members WHERE cart_id = ? AND user_id = ?', [$cart['id'], $user['id']]);
+        $m    = q1('SELECT * FROM cart_members WHERE cart_id = ? AND user_id = ?', [$cart['id'], $user['id']]);
         $name = $user['name'];
     } else {
-        $mid  = $_SESSION['member_of'][$cart['id']] ?? 0;
-        $m    = $mid ? q1('SELECT * FROM cart_members WHERE id = ? AND cart_id = ?', [$mid, $cart['id']]) : null;
-        $name = $_SESSION['guest_name'] ?? null;
+        $m    = q1('SELECT * FROM cart_members WHERE cart_id = ? AND token = ? AND user_id IS NULL', [$cart['id'], $token]);
+        $name = guest_name();
     }
+
     if ($m) {
-        exec_sql('UPDATE cart_members SET seen_at = NOW() WHERE id = ?', [$m['id']]);
+        exec_sql('UPDATE cart_members SET seen_at = NOW(), token = ? WHERE id = ?', [$token, $m['id']]);
+        $_SESSION['cart_id'] = $cart['id'];
         return $m;
     }
     if (!$create || !$name) {
         return null;
     }
     $id = insert(
-        'INSERT INTO cart_members (cart_id, user_id, name, is_owner) VALUES (?,?,?,?)',
-        [$cart['id'], $user['id'] ?? null, $name, (int) ($user && (int) $cart['owner_user_id'] === (int) $user['id'])]
+        'INSERT INTO cart_members (cart_id, user_id, token, name, is_owner) VALUES (?,?,?,?,?)',
+        [$cart['id'], $user['id'] ?? null, $token, $name, (int) ($user && (int) $cart['owner_user_id'] === (int) $user['id'])]
     );
-    if (!$user) {
-        $_SESSION['member_of'][$cart['id']] = $id;
-    }
     $_SESSION['cart_id'] = $cart['id'];
     return q1('SELECT * FROM cart_members WHERE id = ?', [$id]);
 }

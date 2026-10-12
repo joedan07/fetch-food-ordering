@@ -132,18 +132,25 @@ function setNum(el, value, { prefix = '', suffix = '', decimals = 0 } = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  /* --- scroll reveal: sections, cards, rows ------------------------------ */
+  /* --- scroll reveal: sections, cards, rows ------------------------------
+     Only things below the fold are ever hidden, so a slow or failed script can
+     never leave someone staring at a blank page. A timer reveals whatever is
+     left after a couple of seconds, whatever the observer thinks. */
   const targets = document.querySelectorAll('.card, .stat, .table-wrap, .r-card, .tape, .bars-wrap, .empty');
   if (!REDUCED && targets.length) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: .08, rootMargin: '0px 0px -30px 0px' });
-    targets.forEach((el, i) => {
-      // things already on screen at load get a quick stagger instead of a wait
+    }, { threshold: .05, rootMargin: '0px 0px -20px 0px' });
+
+    let below = 0;
+    targets.forEach((el) => {
+      if (el.getBoundingClientRect().top < innerHeight * 0.95) return;   // already visible: leave it alone
       el.setAttribute('data-reveal', '');
-      el.style.setProperty('--d', Math.min(i, 6));
+      el.style.setProperty('--d', Math.min(below++, 6));
       io.observe(el);
     });
+
+    setTimeout(() => document.querySelectorAll('[data-reveal]:not(.in)').forEach((el) => el.classList.add('in')), 2500);
   }
 
   /* --- scroll progress + shrinking top bar ------------------------------- */

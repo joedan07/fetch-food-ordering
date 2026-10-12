@@ -30,7 +30,7 @@ try {
                 if (mb_strlen($name) < 2) {
                     json_out(['error' => 'Type the name your friends will recognise.'], 422);
                 }
-                $_SESSION['guest_name'] = mb_substr($name, 0, 40);
+                remember_guest_name($name);
             }
             $me = cart_member($cart);
             $_SESSION['cart_id'] = $cart['id'];
@@ -120,7 +120,7 @@ try {
 
         case 'leave':
             exec_sql('DELETE FROM cart_members WHERE id = ? AND is_owner = 0', [$me['id']]);
-            unset($_SESSION['member_of'][$cart['id']], $_SESSION['cart_id']);
+            unset($_SESSION['cart_id']);
             json_out(['left' => true]);
 
         default:

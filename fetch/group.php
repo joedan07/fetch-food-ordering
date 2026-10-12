@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (mb_strlen($name) < 2) {
                 $error = 'Type the name your friends will recognise.';
             } else {
-                $_SESSION['guest_name'] = mb_substr($name, 0, 40);
+                remember_guest_name($name);
             }
         }
         if (!$error) {
@@ -72,7 +72,7 @@ page_head('Join a group cart', 'plain-page');
       </label>
       <?php if (!is_logged_in()): ?>
         <label class="field"><span>Your name</span>
-          <input class="input" name="name" required minlength="2" placeholder="Aarav" value="<?= e($_SESSION['guest_name'] ?? '') ?>">
+          <input class="input" name="name" required minlength="2" placeholder="Aarav" value="<?= e(guest_name() ?? '') ?>">
         </label>
         <p class="xs dim mb">No account needed to add food to someone else's cart — the host checks out for everyone.</p>
       <?php endif; ?>

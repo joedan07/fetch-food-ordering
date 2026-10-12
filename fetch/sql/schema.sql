@@ -75,12 +75,14 @@ CREATE TABLE cart_members (
   id        INT AUTO_INCREMENT PRIMARY KEY,
   cart_id   INT NOT NULL,
   user_id   INT DEFAULT NULL,                     -- null for a guest who joined by link
+  token     CHAR(32) DEFAULT NULL,                -- the browser that this member is, cookie-based
   name      VARCHAR(60) NOT NULL,
   is_owner  TINYINT(1) NOT NULL DEFAULT 0,
   seen_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,   -- drives the "online now" dots
   joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX (cart_id, token)
 ) ENGINE=InnoDB;
 
 CREATE TABLE cart_items (
