@@ -21,6 +21,8 @@ $rows = q(
     ['%' . $search . '%', '%' . $search . '%']
 );
 
+$loads = kitchen_loads(array_map('intval', array_column($rows, 'id')));
+
 page_head('Order food');
 topbar('home');
 ?>
@@ -62,7 +64,7 @@ topbar('home');
     <?php else: ?>
     <div class="r-grid">
       <?php foreach ($rows as $r):
-          $load    = kitchen_load((int) $r['id']);
+          $load    = $loads[(int) $r['id']];
           $onTime  = $r['done_count'] ? round($r['on_time_count'] / $r['done_count'] * 100) : null;
       ?>
         <a class="card r-card" href="<?= base_url('restaurant.php?id=' . $r['id']) ?>">

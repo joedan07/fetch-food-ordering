@@ -2,10 +2,10 @@
 /** GET — live kitchen load for every approved restaurant (drives the busy meters). */
 require_once __DIR__ . '/../config.php';
 
+$ids = array_map('intval', array_column(q('SELECT id FROM restaurants WHERE is_approved = 1'), 'id'));
+
 $out = [];
-foreach (q('SELECT id FROM restaurants WHERE is_approved = 1') as $r) {
-    $id   = (int) $r['id'];
-    $load = kitchen_load($id);
+foreach (kitchen_loads($ids) as $id => $load) {
     $out[$id] = [
         'level'       => $load['level'],
         'label'       => $load['label'],

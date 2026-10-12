@@ -123,3 +123,59 @@ function promise_state(array $order): array
         'promised' => (int) $order['promised_min'],
     ];
 }
+
+/**
+ * The same load calculation for several kitchens in one round trip.
+ *
+ * The landing page shows a meter per restaurant; asking the database twice per
+ * restaurant was fine on localhost and slow across the internet, so this does
+ * it with two queries no matter how many kitchens there are.
+ *
+ * @return array<int, array> keyed by restaurant id
+ */
+function kitchen_loads(array $restaurantIds): array
+{
+    if (!$restaurantIds) {
+        return [];
+    }
+    $in  = implode(',', array_fill(0, count($restaurantIds), '?'));
+    $out = [];
+
+    $caps = q("SELECT id, max_parallel_orders, prep_buffer_min FROM restaurants WHERE id IN ($in)", $restaurantIds);
+    $rows = q(
+        "SELECT restaurant_id, status, cook_minutes, accepted_at
+           FROM orders
+          WHERE restaurant_id IN ($in) AND status IN ('placed','accepted','preparing')",
+        $restaurantIds
+    );
+
+    $pending = [];
+    $cooking = [];
+    foreach ($rows as $o) {
+        $rid  = (int) $o['restaurant_id'];
+        $work = (float) $o['cook_minutes'];
+        if ($o['status'] === 'preparing' && $o['accepted_at']) {
+            $work = max(0.0, $work - (time() - strtotime($o['accepted_at'])) / 60);
+        }
+        $pending[$rid] = ($pending[$rid] ?? 0) + $work;
+        $cooking[$rid] = ($cooking[$rid] ?? 0) + 1;
+    }
+
+    foreach ($caps as $r) {
+        $id       = (int) $r['id'];
+        $capacity = max(1, (int) $r['max_parallel_orders']);
+        $work     = $pending[$id] ?? 0;
+        $loadPct  = (int) min(100, round($work / ($capacity * 20) * 100));
+        $out[$id] = [
+            'orders_cooking' => $cooking[$id] ?? 0,
+            'pending_min'    => (int) ceil($work),
+            'capacity'       => $capacity,
+            'buffer'         => (int) $r['prep_buffer_min'],
+            'queue_wait'     => (int) ceil($work / $capacity),
+            'load_pct'       => $loadPct,
+            'level'          => $loadPct < 30 ? 'free' : ($loadPct < 65 ? 'steady' : ($loadPct < 90 ? 'busy' : 'slammed')),
+            'label'          => $loadPct < 30 ? 'Kitchen free' : ($loadPct < 65 ? 'Steady' : ($loadPct < 90 ? 'Busy' : 'Slammed')),
+        ];
+    }
+    return $out;
+}

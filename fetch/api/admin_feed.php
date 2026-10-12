@@ -3,9 +3,12 @@
 require_once __DIR__ . '/../config.php';
 require_role('admin');
 
+$restaurants = q('SELECT id, name FROM restaurants WHERE is_approved = 1 ORDER BY name');
+$loads       = kitchen_loads(array_map('intval', array_column($restaurants, 'id')));
+
 $kitchens = [];
-foreach (q('SELECT id, name FROM restaurants WHERE is_approved = 1 ORDER BY name') as $r) {
-    $kitchens[] = ['name' => $r['name']] + kitchen_load((int) $r['id']);
+foreach ($restaurants as $r) {
+    $kitchens[] = ['name' => $r['name']] + $loads[(int) $r['id']];
 }
 
 $live = array_map(function ($o) {
