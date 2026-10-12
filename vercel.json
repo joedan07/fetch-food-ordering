@@ -1,15 +1,42 @@
 {
   "version": 2,
+  "regions": [
+    "sin1"
+  ],
   "builds": [
-    { "src": "api/index.php", "use": "vercel-php@0.9.0" },
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "fetch/assets/**", "use": "@vercel/static" },
-    { "src": "fetch/sql/menu-sample.xml", "use": "@vercel/static" }
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.9.0"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "fetch/assets/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "fetch/sql/menu-sample.xml",
+      "use": "@vercel/static"
+    }
   ],
   "routes": [
-    { "src": "/deck", "dest": "/index.html" },
-    { "src": "/assets/(.*)", "dest": "/fetch/assets/$1" },
-    { "src": "/sql/menu-sample.xml", "dest": "/fetch/sql/menu-sample.xml" },
-    { "src": "/(.*)", "dest": "/api/index.php" }
+    {
+      "src": "/deck",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/fetch/assets/$1"
+    },
+    {
+      "src": "/sql/menu-sample.xml",
+      "dest": "/fetch/sql/menu-sample.xml"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
   ]
 }
