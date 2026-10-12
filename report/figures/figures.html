@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report figures</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; background: #fff; color: #14110e; }
+  .fig { display: none; width: 1200px; padding: 28px 30px; }
+  .fig:target, body.all .fig { display: block; }
+  h2 { font-size: 17px; margin-bottom: 18px; letter-spacing: .01em; }
+  svg { display: block; }
+  text { font-family: "Helvetica Neue", Arial, sans-serif; fill: #14110e; }
+  .ttl { font-size: 15px; font-weight: 700; }
+  .sub { font-size: 12px; fill: #6b6256; }
+  .lbl { font-size: 12.5px; }
+  .sm { font-size: 11.5px; fill: #4a423a; }
+  .mono { font-family: "SF Mono", Menlo, monospace; font-size: 11.5px; }
+  .box { fill: #fff; stroke: #14110e; stroke-width: 1.4; }
+  .box-soft { fill: #faf6f0; stroke: #a89a88; stroke-width: 1.2; }
+  .box-em { fill: #fff4ee; stroke: #d4480f; stroke-width: 1.6; }
+  .arrow { stroke: #14110e; stroke-width: 1.4; fill: none; marker-end: url(#a); }
+  .arrow-em { stroke: #d4480f; stroke-width: 1.6; fill: none; marker-end: url(#ae); }
+  .dash { stroke-dasharray: 5 4; }
+  .bar { fill: #d4480f; } .bar2 { fill: #8c8276; } .bar3 { fill: #1d7a53; }
+  .grid { stroke: #e2d9cc; stroke-width: 1; }
+  .cap { font-size: 12px; fill: #6b6256; margin-top: 10px; display: block; }
+</style>
+</head>
+<body>
+
+<!-- ============================== 1. ARCHITECTURE ============================== -->
+<section class="fig" id="arch">
+<svg width="1140" height="560" viewBox="0 0 1140 560">
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#14110e"/></marker>
+    <marker id="ae" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#d4480f"/></marker>
+  </defs>
+
+  <!-- tier headers -->
+  <text class="ttl" x="20" y="24">PRESENTATION TIER</text>
+  <text class="ttl" x="430" y="24">APPLICATION TIER</text>
+  <text class="ttl" x="860" y="24">DATA TIER</text>
+  <text class="sub" x="20" y="42">Web browser (client side)</text>
+  <text class="sub" x="430" y="42">Apache / Vercel + PHP 8</text>
+  <text class="sub" x="860" y="42">MySQL 8 (InnoDB)</text>
+
+  <!-- client boxes -->
+  <rect class="box" x="20" y="60" width="330" height="56" rx="6"/>
+  <text class="lbl" x="36" y="84">Customer storefront</text>
+  <text class="sm" x="36" y="102">menu · cart · group cart · tracking</text>
+
+  <rect class="box" x="20" y="128" width="330" height="56" rx="6"/>
+  <text class="lbl" x="36" y="152">Restaurant console</text>
+  <text class="sm" x="36" y="170">live tickets · menu CRUD · insights</text>
+
+  <rect class="box" x="20" y="196" width="330" height="56" rx="6"/>
+  <text class="lbl" x="36" y="220">Rider console</text>
+  <text class="sm" x="36" y="238">available jobs · pickup · delivery</text>
+
+  <rect class="box" x="20" y="264" width="330" height="56" rx="6"/>
+  <text class="lbl" x="36" y="288">Admin console</text>
+  <text class="sm" x="36" y="306">approvals · users · platform metrics</text>
+
+  <rect class="box-soft" x="20" y="340" width="330" height="76" rx="6"/>
+  <text class="lbl" x="36" y="364">Client-side logic</text>
+  <text class="sm" x="36" y="382">HTML5 · CSS3 · ES6 · DOM API</text>
+  <text class="sm" x="36" y="400">fetch() polling · localStorage (theme)</text>
+
+  <!-- arrows client -> server -->
+  <path class="arrow-em" d="M352,150 H 430"/>
+  <text class="mono" x="360" y="140" fill="#d4480f">request</text>
+  <path class="arrow" d="M430,230 H 352"/>
+  <text class="mono" x="358" y="220">response</text>
+
+  <!-- server -->
+  <rect class="box-em" x="432" y="60" width="330" height="356" rx="8"/>
+  <text class="lbl" x="450" y="86" font-weight="700">Request handling</text>
+  <rect class="box" x="450" y="98" width="294" height="34" rx="5"/><text class="sm" x="462" y="120">auth.php — sessions, password_verify(), role guards</text>
+  <rect class="box" x="450" y="140" width="294" height="34" rx="5"/><text class="sm" x="462" y="162">menu.php / restaurant pages — catalogue</text>
+  <rect class="box" x="450" y="182" width="294" height="34" rx="5"/><text class="sm" x="462" y="204">api/cart.php — group cart state machine</text>
+  <rect class="box" x="450" y="224" width="294" height="34" rx="5"/><text class="sm" x="462" y="246">api/orders · status · rider · kitchen</text>
+  <rect class="box-soft" x="450" y="272" width="294" height="60" rx="5"/>
+  <text class="sm" x="462" y="292" font-weight="700">lib/eta.php — honest ETA engine</text>
+  <text class="sm" x="462" y="310">queue wait + cook time + ride time</text>
+  <rect class="box-soft" x="450" y="340" width="294" height="60" rx="5"/>
+  <text class="sm" x="462" y="360" font-weight="700">Cross-cutting</text>
+  <text class="sm" x="462" y="378">CSRF tokens · htmlspecialchars() · validation</text>
+
+  <!-- arrows server -> db -->
+  <path class="arrow-em" d="M766,150 H 844"/>
+  <text class="mono" x="778" y="140" fill="#d4480f">SQL</text>
+  <path class="arrow" d="M844,230 H 766"/>
+  <text class="mono" x="776" y="220">rows</text>
+
+  <!-- db -->
+  <rect class="box" x="846" y="60" width="274" height="200" rx="6"/>
+  <text class="lbl" x="862" y="84">MySQL — 12 tables</text>
+  <text class="sm" x="862" y="106">users · restaurants · categories</text>
+  <text class="sm" x="862" y="124">menu_items · carts · cart_members</text>
+  <text class="sm" x="862" y="142">cart_items · orders · order_items</text>
+  <text class="sm" x="862" y="160">order_events · reviews · sessions</text>
+  <text class="sm" x="862" y="186">InnoDB · foreign keys · transactions</text>
+  <text class="sm" x="862" y="204">prepared statements only</text>
+  <text class="sm" x="862" y="230">sessions table used on serverless</text>
+
+  <rect class="box-soft" x="846" y="276" width="274" height="90" rx="6"/>
+  <text class="lbl" x="862" y="300">File storage</text>
+  <text class="sm" x="862" y="322">uploads/ — dish photographs</text>
+  <text class="sm" x="862" y="340">sql/menu.xsd — schema for imports</text>
+  <text class="sm" x="862" y="358">sql/menu-sample.xml — bulk menu</text>
+
+  <!-- xml import path -->
+  <path class="arrow dash" d="M983,276 V 262"/>
+
+  <!-- footer note -->
+  <line class="grid" x1="20" y1="450" x2="1120" y2="450"/>
+  <text class="sm" x="20" y="474">The browser never talks to the database directly; every data access is validated and authorised in the application tier.</text>
+  <text class="sm" x="20" y="494">Live updates are obtained by periodic AJAX polling (3–6 s) rather than server push, keeping the stack within PHP and Apache.</text>
+</svg>
+</section>
+
+<!-- ============================== 2. ORDER FLOWCHART ============================== -->
+<section class="fig" id="flow">
+<svg width="1140" height="620" viewBox="0 0 1140 620">
+  <defs>
+    <marker id="a2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#14110e"/></marker>
+  </defs>
+  <style>.ar { stroke:#14110e; stroke-width:1.4; fill:none; marker-end:url(#a2); }</style>
+
+  <!-- lanes -->
+  <line class="grid" x1="150" y1="40" x2="150" y2="590"/>
+  <line class="grid" x1="470" y1="40" x2="470" y2="590"/>
+  <line class="grid" x1="790" y1="40" x2="790" y2="590"/>
+  <text class="ttl" x="20" y="34">CUSTOMER</text>
+  <text class="ttl" x="300" y="34">SERVER (PHP)</text>
+  <text class="ttl" x="620" y="34">KITCHEN</text>
+  <text class="ttl" x="900" y="34">RIDER</text>
+
+  <!-- customer lane -->
+  <rect class="box" x="16" y="56" width="124" height="46" rx="6"/><text class="sm" x="28" y="76">Browse menu</text><text class="sm" x="28" y="92">(live busy meter)</text>
+  <rect class="box" x="16" y="128" width="124" height="46" rx="6"/><text class="sm" x="28" y="148">Add dishes</text><text class="sm" x="28" y="164">to cart</text>
+  <rect class="box-em" x="16" y="200" width="124" height="60" rx="6"/><text class="sm" x="28" y="220" font-weight="700">Share cart</text><text class="sm" x="28" y="236">6-letter code;</text><text class="sm" x="28" y="252">friends join live</text>
+  <rect class="box" x="16" y="286" width="124" height="46" rx="6"/><text class="sm" x="28" y="306">Checkout</text><text class="sm" x="28" y="322">address + payment</text>
+  <rect class="box" x="16" y="420" width="124" height="46" rx="6"/><text class="sm" x="28" y="440">Track order</text><text class="sm" x="28" y="456">(polling 5 s)</text>
+  <rect class="box" x="16" y="500" width="124" height="46" rx="6"/><text class="sm" x="28" y="520">Receive food</text><text class="sm" x="28" y="536">and rate</text>
+
+  <!-- server lane -->
+  <rect class="box" x="166" y="56" width="290" height="46" rx="6"/><text class="sm" x="180" y="76">GET /api/menu — dishes + availability</text><text class="mono" x="180" y="93">SELECT … FROM menu_items</text>
+  <rect class="box" x="166" y="128" width="290" height="46" rx="6"/><text class="sm" x="180" y="148">POST /api/cart.php — line stored against</text><text class="sm" x="180" y="165">the member who added it</text>
+  <rect class="box-em" x="166" y="200" width="290" height="60" rx="6"/><text class="sm" x="180" y="220" font-weight="700">Group cart state returned to every member</text><text class="sm" x="180" y="238">members · lines · split · live ETA</text><text class="mono" x="180" y="255">poll every 3 s</text>
+  <rect class="box" x="166" y="286" width="290" height="60" rx="6"/><text class="sm" x="180" y="306">POST /api/orders — re-price from database,</text><text class="sm" x="180" y="323">compute promise, INSERT inside a</text><text class="sm" x="180" y="340">transaction → 201 Created</text>
+  <rect class="box-soft" x="166" y="366" width="290" height="40" rx="6"/><text class="sm" x="180" y="391">Promise stored: queue + cook + ride</text>
+  <rect class="box" x="166" y="420" width="290" height="46" rx="6"/><text class="sm" x="180" y="440">GET /api/order.php?id= — status, timeline,</text><text class="sm" x="180" y="457">minutes remaining, late flag</text>
+  <rect class="box" x="166" y="500" width="290" height="46" rx="6"/><text class="sm" x="180" y="520">POST /api/review.php — rating recorded</text><text class="sm" x="180" y="537">with on-time outcome</text>
+
+  <!-- kitchen lane -->
+  <rect class="box" x="490" y="286" width="286" height="46" rx="6"/><text class="sm" x="504" y="306">Ticket appears on kitchen board</text><text class="sm" x="504" y="323">status: placed</text>
+  <rect class="box" x="490" y="350" width="286" height="46" rx="6"/><text class="sm" x="504" y="370">Accept → Preparing → Ready</text><text class="mono" x="504" y="387">POST /api/status.php</text>
+  <rect class="box-soft" x="490" y="414" width="286" height="44" rx="6"/><text class="sm" x="504" y="434">Queue depth changes, so quoted ETA for</text><text class="sm" x="504" y="451">new customers changes immediately</text>
+
+  <!-- rider lane -->
+  <rect class="box" x="806" y="350" width="300" height="46" rx="6"/><text class="sm" x="820" y="370">Ready orders listed for riders</text><text class="sm" x="820" y="387">single conditional UPDATE claims one</text>
+  <rect class="box" x="806" y="420" width="300" height="46" rx="6"/><text class="sm" x="820" y="440">Picked up → Out for delivery</text>
+  <rect class="box" x="806" y="490" width="300" height="46" rx="6"/><text class="sm" x="820" y="510">Delivered → actual time compared with</text><text class="sm" x="820" y="527">the promise made at checkout</text>
+
+  <!-- arrows -->
+  <path class="ar" d="M78,102 V 128"/>
+  <path class="ar" d="M78,174 V 200"/>
+  <path class="ar" d="M78,260 V 286"/>
+  <path class="ar" d="M140,79 H 166"/>
+  <path class="ar" d="M140,151 H 166"/>
+  <path class="ar" d="M140,230 H 166"/>
+  <path class="ar" d="M140,309 H 166"/>
+  <path class="ar" d="M311,346 V 366"/>
+  <path class="ar" d="M456,309 H 490"/>
+  <path class="ar" d="M633,332 V 350"/>
+  <path class="ar" d="M633,396 V 414"/>
+  <path class="ar" d="M776,373 H 806"/>
+  <path class="ar" d="M956,396 V 420"/>
+  <path class="ar" d="M956,466 V 490"/>
+  <path class="ar" d="M806,513 H 456"/>
+  <path class="ar" d="M166,443 H 140"/>
+  <path class="ar" d="M78,466 V 500"/>
+  <path class="ar" d="M140,523 H 166"/>
+</svg>
+</section>
+
+<!-- ============================== 3. USE CASE ============================== -->
+<section class="fig" id="usecase">
+<svg width="1140" height="600" viewBox="0 0 1140 600">
+  <defs><marker id="a3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8c8276"/></marker></defs>
+  <style>.rel { stroke:#8c8276; stroke-width:1.1; fill:none; } .uc { fill:#fff; stroke:#14110e; stroke-width:1.3; } .uce { fill:#fff4ee; stroke:#d4480f; stroke-width:1.5; }</style>
+
+  <rect x="300" y="40" width="540" height="520" rx="10" fill="none" stroke="#c9bdae" stroke-dasharray="6 5"/>
+  <text class="sub" x="316" y="62">Fetch — Online Food Ordering System</text>
+
+  <!-- actors -->
+  <g>
+    <circle cx="120" cy="100" r="13" class="box"/><path class="rel" d="M120,113 V 145 M104,124 H 136 M120,145 L106,168 M120,145 L134,168"/>
+    <text class="lbl" x="86" y="190">Customer</text>
+  </g>
+  <g>
+    <circle cx="120" cy="250" r="13" class="box"/><path class="rel" d="M120,263 V 295 M104,274 H 136 M120,295 L106,318 M120,295 L134,318"/>
+    <text class="lbl" x="78" y="340">Guest (no account)</text>
+  </g>
+  <g>
+    <circle cx="1020" cy="110" r="13" class="box"/><path class="rel" d="M1020,123 V 155 M1004,134 H 1036 M1020,155 L1006,178 M1020,155 L1034,178"/>
+    <text class="lbl" x="974" y="200">Restaurant</text>
+  </g>
+  <g>
+    <circle cx="1020" cy="280" r="13" class="box"/><path class="rel" d="M1020,293 V 325 M1004,304 H 1036 M1020,325 L1006,348 M1020,325 L1034,348"/>
+    <text class="lbl" x="1000" y="370">Rider</text>
+  </g>
+  <g>
+    <circle cx="1020" cy="440" r="13" class="box"/><path class="rel" d="M1020,453 V 485 M1004,464 H 1036 M1020,485 L1006,508 M1020,485 L1034,508"/>
+    <text class="lbl" x="996" y="530">Admin</text>
+  </g>
+
+  <!-- use cases -->
+  <ellipse class="uc" cx="430" cy="92" rx="104" ry="25"/><text class="sm" x="430" y="97" text-anchor="middle">Register / sign in</text>
+  <ellipse class="uc" cx="430" cy="152" rx="104" ry="25"/><text class="sm" x="430" y="157" text-anchor="middle">Browse menu &amp; busy meter</text>
+  <ellipse class="uce" cx="430" cy="212" rx="104" ry="25"/><text class="sm" x="430" y="217" text-anchor="middle" font-weight="700">Create group cart</text>
+  <ellipse class="uce" cx="430" cy="272" rx="104" ry="25"/><text class="sm" x="430" y="277" text-anchor="middle" font-weight="700">Join cart by code</text>
+  <ellipse class="uc" cx="430" cy="332" rx="104" ry="25"/><text class="sm" x="430" y="337" text-anchor="middle">Add items to shared cart</text>
+  <ellipse class="uc" cx="430" cy="392" rx="104" ry="25"/><text class="sm" x="430" y="397" text-anchor="middle">Checkout &amp; split bill</text>
+  <ellipse class="uc" cx="430" cy="452" rx="104" ry="25"/><text class="sm" x="430" y="457" text-anchor="middle">Track order live</text>
+  <ellipse class="uc" cx="430" cy="512" rx="104" ry="25"/><text class="sm" x="430" y="517" text-anchor="middle">Rate delivered order</text>
+
+  <ellipse class="uc" cx="700" cy="92" rx="104" ry="25"/><text class="sm" x="700" y="97" text-anchor="middle">Manage menu (CRUD)</text>
+  <ellipse class="uc" cx="700" cy="152" rx="104" ry="25"/><text class="sm" x="700" y="157" text-anchor="middle">Import menu from XML</text>
+  <ellipse class="uce" cx="700" cy="212" rx="104" ry="25"/><text class="sm" x="700" y="217" text-anchor="middle" font-weight="700">Advance order status</text>
+  <ellipse class="uc" cx="700" cy="272" rx="104" ry="25"/><text class="sm" x="700" y="277" text-anchor="middle">Set kitchen capacity</text>
+  <ellipse class="uc" cx="700" cy="332" rx="104" ry="25"/><text class="sm" x="700" y="337" text-anchor="middle">Claim delivery job</text>
+  <ellipse class="uc" cx="700" cy="392" rx="104" ry="25"/><text class="sm" x="700" y="397" text-anchor="middle">Mark picked up / delivered</text>
+  <ellipse class="uc" cx="700" cy="452" rx="104" ry="25"/><text class="sm" x="700" y="457" text-anchor="middle">Approve restaurants</text>
+  <ellipse class="uc" cx="700" cy="512" rx="104" ry="25"/><text class="sm" x="700" y="517" text-anchor="middle">View platform analytics</text>
+
+  <!-- links -->
+  <path class="rel" d="M150,110 L326,92 M150,112 L326,152 M150,118 L326,212 M150,124 L326,392 M150,130 L326,452 M150,136 L326,512"/>
+  <path class="rel" d="M150,262 L326,272 M150,268 L326,332"/>
+  <path class="rel" d="M990,112 L804,92 M990,116 L804,152 M990,120 L804,212 M990,126 L804,272"/>
+  <path class="rel" d="M990,286 L804,332 M990,292 L804,392"/>
+  <path class="rel" d="M990,446 L804,452 M990,452 L804,512"/>
+</svg>
+</section>
+
+<!-- ============================== 4. DFD ============================== -->
+<section class="fig" id="dfd">
+<svg width="1140" height="580" viewBox="0 0 1140 580">
+  <defs><marker id="a4" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#14110e"/></marker></defs>
+  <style>.ar4 { stroke:#14110e; stroke-width:1.3; fill:none; marker-end:url(#a4); } .proc { fill:#fff4ee; stroke:#d4480f; stroke-width:1.5; } .store { fill:#faf6f0; stroke:#14110e; stroke-width:1.3; }</style>
+
+  <!-- external entities -->
+  <rect class="box" x="20" y="60" width="140" height="48" rx="3"/><text class="sm" x="90" y="89" text-anchor="middle">Customer / Guest</text>
+  <rect class="box" x="20" y="250" width="140" height="48" rx="3"/><text class="sm" x="90" y="279" text-anchor="middle">Restaurant staff</text>
+  <rect class="box" x="20" y="440" width="140" height="48" rx="3"/><text class="sm" x="90" y="469" text-anchor="middle">Rider / Admin</text>
+
+  <!-- processes -->
+  <circle class="proc" cx="400" cy="84" r="54"/><text class="sm" x="400" y="80" text-anchor="middle">1.0</text><text class="sm" x="400" y="96" text-anchor="middle">Catalogue</text>
+  <circle class="proc" cx="400" cy="230" r="54"/><text class="sm" x="400" y="222" text-anchor="middle">2.0</text><text class="sm" x="400" y="238" text-anchor="middle">Group cart</text>
+  <circle class="proc" cx="400" cy="376" r="54"/><text class="sm" x="400" y="368" text-anchor="middle">3.0</text><text class="sm" x="400" y="384" text-anchor="middle">Ordering</text>
+  <circle class="proc" cx="400" cy="508" r="48"/><text class="sm" x="400" y="502" text-anchor="middle">4.0</text><text class="sm" x="400" y="518" text-anchor="middle">Fulfilment</text>
+  <circle class="proc" cx="700" cy="150" r="54"/><text class="sm" x="700" y="142" text-anchor="middle">5.0</text><text class="sm" x="700" y="158" text-anchor="middle">ETA engine</text>
+  <circle class="proc" cx="700" cy="430" r="54"/><text class="sm" x="700" y="422" text-anchor="middle">6.0</text><text class="sm" x="700" y="438" text-anchor="middle">Analytics</text>
+
+  <!-- data stores -->
+  <g>
+    <line class="grid" x1="900" y1="60" x2="1120" y2="60" stroke="#14110e"/><line class="grid" x1="900" y1="96" x2="1120" y2="96" stroke="#14110e"/>
+    <text class="sm" x="912" y="84">D1 | menu_items, categories</text>
+  </g>
+  <g>
+    <line class="grid" x1="900" y1="150" x2="1120" y2="150" stroke="#14110e"/><line class="grid" x1="900" y1="186" x2="1120" y2="186" stroke="#14110e"/>
+    <text class="sm" x="912" y="174">D2 | carts, cart_members, cart_items</text>
+  </g>
+  <g>
+    <line class="grid" x1="900" y1="240" x2="1120" y2="240" stroke="#14110e"/><line class="grid" x1="900" y1="276" x2="1120" y2="276" stroke="#14110e"/>
+    <text class="sm" x="912" y="264">D3 | orders, order_items</text>
+  </g>
+  <g>
+    <line class="grid" x1="900" y1="330" x2="1120" y2="330" stroke="#14110e"/><line class="grid" x1="900" y1="366" x2="1120" y2="366" stroke="#14110e"/>
+    <text class="sm" x="912" y="354">D4 | order_events</text>
+  </g>
+  <g>
+    <line class="grid" x1="900" y1="420" x2="1120" y2="420" stroke="#14110e"/><line class="grid" x1="900" y1="456" x2="1120" y2="456" stroke="#14110e"/>
+    <text class="sm" x="912" y="444">D5 | users, sessions</text>
+  </g>
+  <g>
+    <line class="grid" x1="900" y1="510" x2="1120" y2="510" stroke="#14110e"/><line class="grid" x1="900" y1="546" x2="1120" y2="546" stroke="#14110e"/>
+    <text class="sm" x="912" y="534">D6 | reviews</text>
+  </g>
+
+  <!-- flows -->
+  <path class="ar4" d="M160,78 H 344"/><text class="sm" x="196" y="70">dish query</text>
+  <path class="ar4" d="M344,100 H 160"/><text class="sm" x="196" y="120">menu + ETA quote</text>
+  <path class="ar4" d="M160,250 Q 280,210 346,222"/><text class="sm" x="186" y="228">status change</text>
+  <path class="ar4" d="M160,450 Q 280,430 352,398"/><text class="sm" x="186" y="424">claim / deliver</text>
+  <path class="ar4" d="M120,108 V 250"/><text class="sm" x="124" y="186">sign-in</text>
+
+  <path class="ar4" d="M400,138 V 176"/><text class="sm" x="408" y="162">cart items</text>
+  <path class="ar4" d="M400,284 V 322"/><text class="sm" x="408" y="308">confirmed basket</text>
+  <path class="ar4" d="M400,430 V 460"/><text class="sm" x="408" y="450">order record</text>
+
+  <path class="ar4" d="M454,96 H 646"/><text class="sm" x="494" y="88">prep times, queue</text>
+  <path class="ar4" d="M646,170 Q 540,200 452,218"/><text class="sm" x="494" y="202">promised minutes</text>
+  <path class="ar4" d="M646,410 Q 540,400 452,388"/>
+  <path class="ar4" d="M452,398 Q 560,470 646,452"/><text class="sm" x="500" y="470">timings &amp; outcomes</text>
+
+  <path class="ar4" d="M454,78 H 896"/>
+  <path class="ar4" d="M454,230 H 896 L 896,168"/>
+  <path class="ar4" d="M454,376 H 896 L 896,258"/>
+  <path class="ar4" d="M448,490 H 896 L 896,348"/>
+  <path class="ar4" d="M754,430 H 896 L 896,438"/>
+  <path class="ar4" d="M754,150 H 860 L 860,528 H 896"/>
+</svg>
+</section>
+
+<!-- ============================== 5. ER DIAGRAM ============================== -->
+<section class="fig" id="er">
+<svg width="1140" height="640" viewBox="0 0 1140 640">
+  <style>
+    .tbl rect { fill:#fff; stroke:#14110e; stroke-width:1.3; }
+    .thead { fill:#fff4ee; stroke:#d4480f; stroke-width:1.4; }
+    .fld { font-size:11px; fill:#4a423a; font-family:"SF Mono",Menlo,monospace; }
+    .tname { font-size:12px; font-weight:700; }
+    .rel2 { stroke:#8c8276; stroke-width:1.2; fill:none; }
+    .card { font-size:10.5px; fill:#6b6256; font-family:"SF Mono",Menlo,monospace; }
+  </style>
+
+  <!-- users -->
+  <g class="tbl"><rect class="thead" x="20" y="40" width="186" height="24"/><rect x="20" y="64" width="186" height="104"/>
+    <text class="tname" x="30" y="57">users</text>
+    <text class="fld" x="30" y="82">id  PK</text><text class="fld" x="30" y="100">name, email UQ, phone</text>
+    <text class="fld" x="30" y="118">password_hash</text><text class="fld" x="30" y="136">role ENUM(4)</text><text class="fld" x="30" y="154">restaurant_id  FK</text>
+  </g>
+  <!-- restaurants -->
+  <g class="tbl"><rect class="thead" x="300" y="40" width="200" height="24"/><rect x="300" y="64" width="200" height="122"/>
+    <text class="tname" x="310" y="57">restaurants</text>
+    <text class="fld" x="310" y="82">id  PK</text><text class="fld" x="310" y="100">name, cuisine, address</text>
+    <text class="fld" x="310" y="118">is_open, is_approved</text><text class="fld" x="310" y="136">max_parallel_orders</text>
+    <text class="fld" x="310" y="154">prep_buffer_min</text><text class="fld" x="310" y="172">commission_pct</text>
+  </g>
+  <!-- categories -->
+  <g class="tbl"><rect class="thead" x="600" y="40" width="172" height="24"/><rect x="600" y="64" width="172" height="68"/>
+    <text class="tname" x="610" y="57">categories</text>
+    <text class="fld" x="610" y="82">id  PK</text><text class="fld" x="610" y="100">restaurant_id  FK</text><text class="fld" x="610" y="118">name, sort_order</text>
+  </g>
+  <!-- menu_items -->
+  <g class="tbl"><rect class="thead" x="864" y="40" width="200" height="24"/><rect x="864" y="64" width="200" height="140"/>
+    <text class="tname" x="874" y="57">menu_items</text>
+    <text class="fld" x="874" y="82">id  PK</text><text class="fld" x="874" y="100">restaurant_id  FK</text>
+    <text class="fld" x="874" y="118">category_id  FK</text><text class="fld" x="874" y="136">name, description</text>
+    <text class="fld" x="874" y="154">price, is_veg</text><text class="fld" x="874" y="172">prep_minutes</text><text class="fld" x="874" y="190">is_available, image</text>
+  </g>
+  <!-- carts -->
+  <g class="tbl"><rect class="thead" x="20" y="250" width="186" height="24"/><rect x="20" y="274" width="186" height="104"/>
+    <text class="tname" x="30" y="267">carts</text>
+    <text class="fld" x="30" y="292">id  PK</text><text class="fld" x="30" y="310">code UQ (share code)</text>
+    <text class="fld" x="30" y="328">owner_user_id  FK</text><text class="fld" x="30" y="346">restaurant_id  FK</text><text class="fld" x="30" y="364">is_group, status</text>
+  </g>
+  <!-- cart_members -->
+  <g class="tbl"><rect class="thead" x="300" y="250" width="200" height="24"/><rect x="300" y="274" width="200" height="104"/>
+    <text class="tname" x="310" y="267">cart_members</text>
+    <text class="fld" x="310" y="292">id  PK</text><text class="fld" x="310" y="310">cart_id  FK</text>
+    <text class="fld" x="310" y="328">user_id  FK (nullable)</text><text class="fld" x="310" y="346">token (browser cookie)</text>
+    <text class="fld" x="310" y="364">name, is_owner, seen_at</text>
+  </g>
+  <!-- cart_items -->
+  <g class="tbl"><rect class="thead" x="600" y="250" width="172" height="24"/><rect x="600" y="274" width="172" height="86"/>
+    <text class="tname" x="610" y="267">cart_items</text>
+    <text class="fld" x="610" y="292">id  PK</text><text class="fld" x="610" y="310">cart_id  FK</text>
+    <text class="fld" x="610" y="328">member_id  FK</text><text class="fld" x="610" y="346">item_id  FK, qty</text>
+  </g>
+  <!-- orders -->
+  <g class="tbl"><rect class="thead" x="864" y="250" width="200" height="24"/><rect x="864" y="274" width="200" height="158"/>
+    <text class="tname" x="874" y="267">orders</text>
+    <text class="fld" x="874" y="292">id  PK, code UQ</text><text class="fld" x="874" y="310">restaurant_id, user_id  FK</text>
+    <text class="fld" x="874" y="328">cart_id, rider_id  FK</text><text class="fld" x="874" y="346">status ENUM(7)</text>
+    <text class="fld" x="874" y="364">subtotal, fee, total</text><text class="fld" x="874" y="382">cook_minutes, queue_wait</text>
+    <text class="fld" x="874" y="400">promised_min, promised_at</text><text class="fld" x="874" y="418">accepted_at … delivered_at</text>
+  </g>
+  <!-- order_items -->
+  <g class="tbl"><rect class="thead" x="300" y="470" width="200" height="24"/><rect x="300" y="494" width="200" height="86"/>
+    <text class="tname" x="310" y="487">order_items</text>
+    <text class="fld" x="310" y="512">id  PK, order_id  FK</text><text class="fld" x="310" y="530">item_id  FK, name snapshot</text>
+    <text class="fld" x="310" y="548">unit_price, qty</text><text class="fld" x="310" y="566">member_name (split bill)</text>
+  </g>
+  <!-- order_events -->
+  <g class="tbl"><rect class="thead" x="600" y="470" width="172" height="24"/><rect x="600" y="494" width="172" height="68"/>
+    <text class="tname" x="610" y="487">order_events</text>
+    <text class="fld" x="610" y="512">id  PK, order_id  FK</text><text class="fld" x="610" y="530">status, note</text><text class="fld" x="610" y="548">created_at</text>
+  </g>
+  <!-- reviews -->
+  <g class="tbl"><rect class="thead" x="864" y="470" width="200" height="24"/><rect x="864" y="494" width="200" height="86"/>
+    <text class="tname" x="874" y="487">reviews</text>
+    <text class="fld" x="874" y="512">id  PK, order_id UQ  FK</text><text class="fld" x="874" y="530">restaurant_id, user_id  FK</text>
+    <text class="fld" x="874" y="548">stars, on_time</text><text class="fld" x="874" y="566">comment</text>
+  </g>
+  <!-- sessions -->
+  <g class="tbl"><rect class="thead" x="20" y="470" width="186" height="24"/><rect x="20" y="494" width="186" height="68"/>
+    <text class="tname" x="30" y="487">sessions</text>
+    <text class="fld" x="30" y="512">id  PK (session id)</text><text class="fld" x="30" y="530">payload</text><text class="fld" x="30" y="548">updated_at</text>
+  </g>
+
+  <!-- relations -->
+  <path class="rel2" d="M206,100 H 300"/><text class="card" x="222" y="94">N..1</text>
+  <path class="rel2" d="M500,88 H 600"/><text class="card" x="520" y="82">1..N</text>
+  <path class="rel2" d="M772,100 H 864"/><text class="card" x="790" y="94">1..N</text>
+  <path class="rel2" d="M400,186 V 250"/><text class="card" x="406" y="220">1..N</text>
+  <path class="rel2" d="M113,168 V 250"/><text class="card" x="118" y="214">1..N</text>
+  <path class="rel2" d="M206,300 H 300"/><text class="card" x="222" y="294">1..N</text>
+  <path class="rel2" d="M500,310 H 600"/><text class="card" x="520" y="304">1..N</text>
+  <path class="rel2" d="M772,310 H 864"/><text class="card" x="790" y="304">1..1</text>
+  <path class="rel2" d="M964,204 V 250"/><text class="card" x="970" y="232">1..N</text>
+  <path class="rel2" d="M900,432 V 470"/><text class="card" x="906" y="456">1..1</text>
+  <path class="rel2" d="M880,432 Q 700,452 686,470"/><text class="card" x="740" y="452">1..N</text>
+  <path class="rel2" d="M864,420 Q 520,450 400,470"/><text class="card" x="560" y="452">1..N</text>
+</svg>
+</section>
+
+<!-- ============================== 6. ETA BLOCK DIAGRAM ============================== -->
+<section class="fig" id="eta">
+<svg width="1140" height="520" viewBox="0 0 1140 520">
+  <defs><marker id="a6" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#14110e"/></marker></defs>
+  <style>.ar6 { stroke:#14110e; stroke-width:1.4; fill:none; marker-end:url(#a6); }</style>
+
+  <!-- inputs -->
+  <rect class="box" x="20" y="60" width="210" height="62" rx="6"/><text class="sm" x="34" y="84">Active orders in this kitchen</text><text class="mono" x="34" y="104">status ∈ {placed, accepted,</text><text class="mono" x="34" y="118">preparing}</text>
+  <rect class="box" x="20" y="150" width="210" height="62" rx="6"/><text class="sm" x="34" y="174">Per-dish prep time</text><text class="mono" x="34" y="194">menu_items.prep_minutes</text><text class="sm" x="34" y="208">(3–25 min in the demo menu)</text>
+  <rect class="box" x="20" y="240" width="210" height="62" rx="6"/><text class="sm" x="34" y="264">Kitchen capacity</text><text class="mono" x="34" y="284">max_parallel_orders</text><text class="mono" x="34" y="298">prep_buffer_min</text>
+  <rect class="box" x="20" y="330" width="210" height="62" rx="6"/><text class="sm" x="34" y="354">Basket being priced</text><text class="sm" x="34" y="374">dishes and quantities</text><text class="sm" x="34" y="390">currently in the cart</text>
+
+  <!-- stage 1 -->
+  <rect class="box-soft" x="300" y="60" width="240" height="110" rx="6"/>
+  <text class="sm" x="314" y="84" font-weight="700">Step 1 — work on the stoves</text>
+  <text class="mono" x="314" y="106">W = Σ cook_minutes</text>
+  <text class="sm" x="314" y="126">minus elapsed time for orders</text>
+  <text class="sm" x="314" y="142">already being prepared</text>
+  <text class="sm" x="314" y="162">(remaining work, not total work)</text>
+
+  <rect class="box-soft" x="300" y="200" width="240" height="92" rx="6"/>
+  <text class="sm" x="314" y="224" font-weight="700">Step 2 — queue wait</text>
+  <text class="mono" x="314" y="248">Q = ⌈ W / capacity ⌉</text>
+  <text class="sm" x="314" y="270">load% = min(100, W / (cap × 20))</text>
+  <text class="sm" x="314" y="286">drives the live busy meter</text>
+
+  <rect class="box-soft" x="300" y="322" width="240" height="92" rx="6"/>
+  <text class="sm" x="314" y="346" font-weight="700">Step 3 — cook time</text>
+  <text class="mono" x="314" y="370">C = max(prep) + Σ 0.15·prep·qty</text>
+  <text class="sm" x="314" y="392">slowest dish dominates; extra</text>
+  <text class="sm" x="314" y="408">plates add a capped surcharge</text>
+
+  <!-- result -->
+  <rect class="box-em" x="610" y="150" width="250" height="150" rx="8"/>
+  <text class="sm" x="626" y="178" font-weight="700">Quoted delivery time</text>
+  <text class="mono" x="626" y="206">ETA = Q + C + buffer + ride</text>
+  <text class="sm" x="626" y="232">shown before the customer</text>
+  <text class="sm" x="626" y="250">commits, broken into its parts</text>
+  <text class="sm" x="626" y="276">ride = 10 min (configurable)</text>
+
+  <rect class="box" x="610" y="330" width="250" height="110" rx="6"/>
+  <text class="sm" x="626" y="356" font-weight="700">Stored with the order</text>
+  <text class="mono" x="626" y="380">promised_min, promised_at</text>
+  <text class="mono" x="626" y="398">queue_wait_min, load_pct</text>
+  <text class="sm" x="626" y="420">the promise becomes a record</text>
+
+  <rect class="box" x="920" y="150" width="200" height="110" rx="6"/>
+  <text class="sm" x="936" y="176" font-weight="700">Customer view</text>
+  <text class="sm" x="936" y="198">live countdown, late flag</text>
+  <text class="sm" x="936" y="218">when promised_at passes</text>
+  <text class="sm" x="936" y="244">no silent re-estimation</text>
+
+  <rect class="box" x="920" y="300" width="200" height="140" rx="6"/>
+  <text class="sm" x="936" y="326" font-weight="700">Accountability</text>
+  <text class="sm" x="936" y="348">on-time % per restaurant</text>
+  <text class="sm" x="936" y="368">shown to customers, kitchens</text>
+  <text class="sm" x="936" y="388">and the platform admin</text>
+  <text class="sm" x="936" y="414">actual vs promised recorded</text>
+  <text class="sm" x="936" y="432">on every delivery</text>
+
+  <path class="ar6" d="M232,92 H 300"/>
+  <path class="ar6" d="M232,180 H 284 V 240 H 300"/>
+  <path class="ar6" d="M232,270 H 300 V 246"/>
+  <path class="ar6" d="M232,360 H 300"/>
+  <path class="ar6" d="M420,170 V 200"/>
+  <path class="ar6" d="M542,246 H 610 V 218"/>
+  <path class="ar6" d="M542,368 H 580 V 250 H 610"/>
+  <path class="ar6" d="M736,300 V 330"/>
+  <path class="ar6" d="M862,214 H 920"/>
+  <path class="ar6" d="M862,380 H 920"/>
+</svg>
+</section>
+
+<!-- ============================== 7. CHART: PROMISED VS ACTUAL ============================== -->
+<section class="fig" id="chart-promise">
+<svg width="900" height="470" viewBox="0 0 900 470">
+  <text class="ttl" x="30" y="30">Promised versus actual delivery time, by restaurant (n = 24 delivered orders)</text>
+  <line class="grid" x1="90" y1="400" x2="860" y2="400" stroke="#14110e"/>
+  <line class="grid" x1="90" y1="70" x2="90" y2="400" stroke="#14110e"/>
+  <g>
+    <line class="grid" x1="90" y1="345" x2="860" y2="345"/><text class="sm" x="58" y="349">10</text>
+    <line class="grid" x1="90" y1="290" x2="860" y2="290"/><text class="sm" x="58" y="294">20</text>
+    <line class="grid" x1="90" y1="235" x2="860" y2="235"/><text class="sm" x="58" y="239">30</text>
+    <line class="grid" x1="90" y1="180" x2="860" y2="180"/><text class="sm" x="58" y="184">40</text>
+    <line class="grid" x1="90" y1="125" x2="860" y2="125"/><text class="sm" x="58" y="129">50</text>
+    <text class="sm" x="30" y="240" transform="rotate(-90 30,240)">minutes</text>
+  </g>
+  <rect class="bar" x="140" y="136" width="54" height="264"/><rect class="bar2" x="200" y="174.5" width="54" height="225.5"/>
+  <text class="sm" x="197" y="422" text-anchor="middle">Spice Route (n=2)</text>
+  <text class="sm" x="167" y="128" text-anchor="middle">48</text><text class="sm" x="227" y="166" text-anchor="middle">41</text>
+  <rect class="bar" x="320" y="180" width="54" height="220"/><rect class="bar2" x="380" y="185.5" width="54" height="214.5"/>
+  <text class="sm" x="377" y="422" text-anchor="middle">Wok This Way (n=8)</text>
+  <text class="sm" x="347" y="172" text-anchor="middle">40</text><text class="sm" x="407" y="177" text-anchor="middle">39</text>
+  <rect class="bar" x="500" y="218.5" width="54" height="181.5"/><rect class="bar2" x="560" y="224" width="54" height="176"/>
+  <text class="sm" x="557" y="422" text-anchor="middle">Dosa Dock (n=9)</text>
+  <text class="sm" x="527" y="210" text-anchor="middle">33</text><text class="sm" x="587" y="216" text-anchor="middle">32</text>
+  <rect class="bar" x="680" y="246" width="54" height="154"/><rect class="bar2" x="740" y="268" width="54" height="132"/>
+  <text class="sm" x="737" y="422" text-anchor="middle">Brew &amp; Bite (n=5)</text>
+  <text class="sm" x="707" y="238" text-anchor="middle">28</text><text class="sm" x="767" y="260" text-anchor="middle">24</text>
+  <rect class="bar" x="140" y="444" width="14" height="14"/><text class="sm" x="162" y="456">Promised at checkout</text>
+  <rect class="bar2" x="330" y="444" width="14" height="14"/><text class="sm" x="352" y="456">Actual door-to-door</text>
+  <text class="sm" x="560" y="456">Mean absolute error 5.7 min across the dataset</text>
+</svg>
+</section>
+
+<!-- ============================== 8. CHART: ERROR DISTRIBUTION ============================== -->
+<section class="fig" id="chart-error">
+<svg width="900" height="450" viewBox="0 0 900 450">
+  <text class="ttl" x="30" y="30">Distribution of (actual &#8722; promised) delivery time, n = 24</text>
+  <line class="grid" x1="90" y1="370" x2="860" y2="370" stroke="#14110e"/>
+  <line class="grid" x1="90" y1="70" x2="90" y2="370" stroke="#14110e"/>
+  <g>
+    <line class="grid" x1="90" y1="330" x2="860" y2="330"/><text class="sm" x="64" y="334">2</text>
+    <line class="grid" x1="90" y1="270" x2="860" y2="270"/><text class="sm" x="64" y="274">5</text>
+    <line class="grid" x1="90" y1="210" x2="860" y2="210"/><text class="sm" x="64" y="214">8</text>
+    <line class="grid" x1="90" y1="150" x2="860" y2="150"/><text class="sm" x="58" y="154">11</text>
+    <line class="grid" x1="90" y1="90" x2="860" y2="90"/><text class="sm" x="58" y="94">14</text>
+    <text class="sm" x="30" y="240" transform="rotate(-90 30,240)">orders</text>
+  </g>
+  <rect class="bar3" x="130" y="370" width="86" height="0"/><text class="sm" x="173" y="362" text-anchor="middle">0</text>
+  <text class="sm" x="173" y="392" text-anchor="middle">&gt;10 early</text>
+  <rect class="bar3" x="256" y="230" width="86" height="140"/><text class="sm" x="299" y="222" text-anchor="middle">7</text>
+  <text class="sm" x="299" y="392" text-anchor="middle">5&#8211;10 early</text>
+  <rect class="bar3" x="382" y="110" width="86" height="260"/><text class="sm" x="425" y="102" text-anchor="middle">13</text>
+  <text class="sm" x="425" y="392" text-anchor="middle">0&#8211;5 early</text>
+  <rect class="bar2" x="508" y="370" width="86" height="0"/><text class="sm" x="551" y="362" text-anchor="middle">0</text>
+  <text class="sm" x="551" y="392" text-anchor="middle">0&#8211;5 late</text>
+  <rect class="bar" x="634" y="330" width="86" height="40"/><text class="sm" x="677" y="322" text-anchor="middle">2</text>
+  <text class="sm" x="677" y="392" text-anchor="middle">5&#8211;10 late</text>
+  <rect class="bar" x="760" y="330" width="86" height="40"/><text class="sm" x="803" y="322" text-anchor="middle">2</text>
+  <text class="sm" x="803" y="392" text-anchor="middle">&gt;10 late</text>
+  <text class="sm" x="130" y="424">Green: delivered within the promise (20 of 24 = 83%).  Orange: promise missed (4 of 24 = 17%).</text>
+  <text class="sm" x="130" y="442">Mean absolute error 5.7 min; the estimator is deliberately biased towards quoting slightly long.</text>
+</svg>
+</section>
+
+<!-- ============================== 9. CHART: LATENCY ============================== -->
+<section class="fig" id="chart-latency">
+<svg width="900" height="430" viewBox="0 0 900 430">
+  <text class="ttl" x="30" y="30">Median server response time before and after deployment tuning</text>
+  <line class="grid" x1="200" y1="340" x2="860" y2="340" stroke="#14110e"/>
+  <line class="grid" x1="200" y1="60" x2="200" y2="340" stroke="#14110e"/>
+  <g>
+    <line class="grid" x1="200" y1="286" x2="860" y2="286"/><text class="sm" x="168" y="290">2 s</text>
+    <line class="grid" x1="200" y1="232" x2="860" y2="232"/><text class="sm" x="168" y="236">4 s</text>
+    <line class="grid" x1="200" y1="178" x2="860" y2="178"/><text class="sm" x="168" y="182">6 s</text>
+    <line class="grid" x1="200" y1="124" x2="860" y2="124"/><text class="sm" x="168" y="128">8 s</text>
+  </g>
+  <!-- 27px per second -->
+  <rect class="bar" x="240" y="167" width="120" height="173"/><text class="sm" x="300" y="159" text-anchor="middle">6.4 s</text>
+  <text class="sm" x="300" y="362" text-anchor="middle">Cart refresh,</text><text class="sm" x="300" y="378" text-anchor="middle">function in US-East</text>
+  <rect class="bar3" x="420" y="318" width="120" height="22"/><text class="sm" x="480" y="310" text-anchor="middle">0.8 s</text>
+  <text class="sm" x="480" y="362" text-anchor="middle">Same request,</text><text class="sm" x="480" y="378" text-anchor="middle">function in Singapore</text>
+  <rect class="bar2" x="600" y="316" width="120" height="24"/><text class="sm" x="660" y="308" text-anchor="middle">0.9 s</text>
+  <text class="sm" x="660" y="362" text-anchor="middle">Menu page,</text><text class="sm" x="660" y="378" text-anchor="middle">warm function</text>
+  <text class="sm" x="240" y="408">Database queries for the landing page were also reduced from 2N + 1 (N = restaurants) to 3 by batching the kitchen-load lookup.</text>
+</svg>
+</section>
+
+</body>
+</html>

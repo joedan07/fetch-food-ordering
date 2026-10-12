@@ -12,3 +12,8 @@ fetch/uploads/*
 # never commit real credentials
 .env
 .env.local
+
+# report build tooling
+report/node_modules/
+report/package-lock.json
+report/package.json
