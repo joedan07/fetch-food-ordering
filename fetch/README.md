@@ -40,6 +40,16 @@ a promise, and every dashboard measures the kitchen against it. *(`lib/eta.php`)
 | Rider | `rider/` | Unclaimed ready orders, claim, pick up, deliver |
 | Admin | `admin/` | Platform stats and commission, approve/suspend restaurants, onboard restaurants and riders, all orders, all users |
 
+## Where it runs
+
+| | |
+| --- | --- |
+| Live | <https://fetch-food-ordering-joe-daniels-projects-5d434b85.vercel.app> |
+| Local | XAMPP, as set up below |
+
+Both read the same code; the live copy keeps sessions in MySQL and has photo uploads
+switched off, because serverless hosts have no persistent disk.
+
 ## Setup
 
 1. Start **Apache** and **MySQL** in the XAMPP manager.
