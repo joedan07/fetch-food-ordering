@@ -30,6 +30,11 @@ function db(): PDO
     $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', DB_HOST, DB_PORT, DB_NAME);
     try {
         $pdo = new PDO($dsn, DB_USER, DB_PASS, pdo_options());
+        // Put the database in the same time zone as PHP. XAMPP's MySQL already
+        // runs on local time, but a cloud database runs on UTC — and then every
+        // NOW() we store is hours away from the times PHP compares them with,
+        // which makes promised delivery times and "late" nonsense.
+        $pdo->exec("SET time_zone = '" . date('P') . "'");
     } catch (PDOException $e) {
         http_response_code(500);
         $install = base_url('install.php');
