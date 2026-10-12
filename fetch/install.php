@@ -20,7 +20,7 @@ if (!$locked && ($_POST['run'] ?? '') === 'yes') {
             sprintf('mysql:host=%s;port=%d;charset=utf8mb4', DB_HOST, DB_PORT),
             DB_USER,
             DB_PASS,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            pdo_options()
         );
         $root->exec('CREATE DATABASE IF NOT EXISTS `' . DB_NAME . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
         $log[] = 'Database `' . DB_NAME . '` ready';

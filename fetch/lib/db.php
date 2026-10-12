@@ -4,6 +4,20 @@
  * and every query uses prepared statements — no string-built SQL anywhere.
  */
 
+/** Connection options, shared by the app and the installer. */
+function pdo_options(): array
+{
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+    if (DB_SSL) {                       // cloud MySQL refuses plaintext connections
+        $options[PDO::MYSQL_ATTR_SSL_CA] = DB_SSL_CA;
+    }
+    return $options;
+}
+
 function db(): PDO
 {
     static $pdo = null;
@@ -12,16 +26,8 @@ function db(): PDO
     }
 
     $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', DB_HOST, DB_PORT, DB_NAME);
-    $options = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ];
-    if (DB_SSL) {                       // cloud MySQL insists on TLS
-        $options[PDO::MYSQL_ATTR_SSL_CA] = DB_SSL_CA;
-    }
     try {
-        $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, pdo_options());
     } catch (PDOException $e) {
         http_response_code(500);
         $install = base_url('install.php');
