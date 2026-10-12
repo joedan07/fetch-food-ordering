@@ -13,7 +13,9 @@ function pdo_options(): array
         PDO::ATTR_EMULATE_PREPARES   => false,
     ];
     if (DB_SSL) {                       // cloud MySQL refuses plaintext connections
-        $options[PDO::MYSQL_ATTR_SSL_CA] = DB_SSL_CA;
+        // PHP 8.5 renamed this constant; look it up by name so both work.
+        $sslCa = defined('Pdo\\Mysql::ATTR_SSL_CA') ? constant('Pdo\\Mysql::ATTR_SSL_CA') : PDO::MYSQL_ATTR_SSL_CA;
+        $options[$sslCa] = DB_SSL_CA;
     }
     return $options;
 }

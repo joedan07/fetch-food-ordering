@@ -36,6 +36,13 @@ define('DB_SESSIONS', env('DB_SESSIONS', '0') === '1' || getenv('VERCEL') !== fa
 
 date_default_timezone_set('Asia/Kolkata');
 
+// Warnings belong in the log, not in the middle of a page — a stray notice
+// before the first header would break sessions. Locally they stay visible.
+$isLocal = in_array(strtok($_SERVER['HTTP_HOST'] ?? '', ':'), ['localhost', '127.0.0.1', '::1'], true);
+error_reporting(E_ALL & ~E_DEPRECATED);
+ini_set('display_errors', ($isLocal || env('APP_DEBUG') === '1') ? '1' : '0');
+ini_set('log_errors', '1');
+
 // ---- paths ----------------------------------------------------------------
 define('ROOT_PATH', __DIR__);
 // Works whether the app lives at http://localhost/fetch or at a domain root.
